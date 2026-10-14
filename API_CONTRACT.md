@@ -292,15 +292,16 @@ Commit `ml/forecast.csv` with exactly these columns:
 sku,week_start,forecast_units
 ```
 
-- One row per SKU in `data/lead_times.csv` (40 SKUs) for each of the next 4 weekly starts after the latest observed week in `data/sales_history.csv`. That's 160 rows. The horizon rolls forward when new actual sales weeks are added and the forecast is regenerated.
+- One row per SKU in `data/lead_times.csv` (40 SKUs) for each of the next 4 weekly starts after the latest observed week in `data/sales_history.csv`. That's 160 rows.
+- When new actual sales weeks are added, regenerate the file to roll the horizon forward.
 - `forecast_units` is a non-negative number (decimals allowed).
-- These are **real future weeks**. We hold the actual sales and score your file against them.
+- Forecast weeks must be strictly after the latest actual sales week. Never return historical weeks as upcoming predictions.
 
 ### 10.2 Endpoints
 
 | Method & path | Behaviour |
 |---|---|
-| `GET /api/forecast/{sku}/` | `200 {"sku": "...", "forecast": [{"week_start": "YYYY-MM-DD", "forecast_units": 31.4}, ...]}`. Returns the 4 upcoming weeks, with the same values as `ml/forecast.csv`. Unknown SKU or not a forecast SKU → `404`. |
+| `GET /api/forecast/{sku}/` | `200 {"sku": "...", "forecast": [{"week_start": "YYYY-MM-DD", "forecast_units": 31.4}, ...]}`. Returns 4 upcoming weekly forecasts, with the same values as `ml/forecast.csv`. Unknown SKU or not a forecast SKU → `404`. |
 | `GET /api/reorder-suggestions/` | `200 {"results": [ ... ]}` with one entry per forecast SKU (40, not paginated). |
 
 Reorder entry:
