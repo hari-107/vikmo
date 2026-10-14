@@ -65,7 +65,7 @@
 body { margin: 0; min-width: 320px; background: var(--canvas); color: var(--foreground); font-family: var(--font-sans); font-size: 14px; -webkit-font-smoothing: antialiased; }
 ::selection { background: var(--primary-soft); color: var(--primary); }
 button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
-button, a, input, select, textarea, .panel, .topbar, .desktop-sidebar { transition: background-color 180ms, color 180ms, border-color 180ms, box-shadow 180ms; }
+button, a, input, select, textarea, .panel, .topbar, .desktop-sidebar { transition: background-color 220ms ease, color 180ms ease, border-color 180ms ease, box-shadow 220ms ease; }
 button { cursor: pointer; }
 button:disabled { cursor: not-allowed; opacity: .5; }
 button:active:not(:disabled) { transform: translateY(1px); }
@@ -193,3 +193,30 @@ label { letter-spacing: normal !important; text-transform: none !important; }
 @keyframes fade-out { to { opacity: 0; } }
 @keyframes panel-out { to { opacity: 0; transform: translateY(5px); } }
 @keyframes drawer-out { to { transform: translateX(-100%); } }
+
+
+/* Global interaction motion: focus stays clear and controls feel responsive. */
+html { scroll-behavior: smooth; }
+a:not(.nav-item), button, .icon-button, .theme-control, .global-search {
+  transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms cubic-bezier(.2,.75,.25,1);
+}
+button:focus-visible, a:focus-visible {
+  animation: focus-pulse 700ms ease-out 1;
+}
+.topbar { animation: topbar-arrive 360ms ease-out both; }
+.nav-item.active { animation: nav-active-in 220ms ease-out both; }
+.form-control:focus, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  transition: box-shadow 180ms ease, border-color 180ms ease;
+}
+@keyframes topbar-arrive {
+  from { opacity: .75; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes nav-active-in {
+  from { opacity: .65; transform: translateX(-3px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes focus-pulse {
+  0% { outline-offset: 1px; }
+  100% { outline-offset: 4px; }
+}
