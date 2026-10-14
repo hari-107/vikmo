@@ -79,8 +79,11 @@ def generate_forecast(
     if pd.isna(latest_sales_week):
         raise ValueError("sales_history.csv contains no usable historical weeks")
 
-    # Four strictly future weekly starts after the last actual observation.
-    test_weeks = _next_monday_weeks(latest_sales_week, count=4)
+    # Forecast missing intervening buckets internally if the sales history is stale,
+    # but expose only four weekly periods starting next Monday (or after the latest
+    # actual week if that falls later).
+    internal_weeks, output_weeks = _upcoming_week_starts(latest_sales_week, count=4)
+    output_week_strings = {w.strftime("%Y-%m-%d") for w in output_weeks}
     # Sales data after the latest known weekly observation is not used for training.
     train_sales = sales[sales["week_start"] <= latest_sales_week].copy()
 
