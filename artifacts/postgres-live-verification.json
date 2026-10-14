@@ -1,0 +1,6 @@
+{
+  "routes_checked": 6,
+  "mode": "live PostgreSQL-backed API; read-only browser checks",
+  "javascript_errors": [],
+  "api_failures": []
+}

@@ -1,0 +1,18 @@
+/* Shared business table presentation. Alignment remains controlled by each column. */
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+thead { background: var(--subtle); }
+th { font-size: 10px; font-weight: 600; letter-spacing: .06em; color: var(--secondary); white-space: nowrap; }
+td { font-size: 12px; border-bottom: 1px solid var(--line); }
+tr:last-child td { border-bottom: 0; }
+tbody tr { transition: background-color 150ms; }
+tbody tr:hover { background: var(--subtle); }
+.data-table th, .data-table td { padding: 12px 18px; }
+.data-table th { border-bottom: 1px solid var(--line); }
+.kpi-grid > a { animation: page-in 240ms ease-out both; }
+.kpi-grid > a:nth-child(2) { animation-delay: 40ms; }
+.kpi-grid > a:nth-child(3) { animation-delay: 80ms; }
+.kpi-grid > a:nth-child(4) { animation-delay: 120ms; }
+.kpi-card:hover { border-color: var(--primary-line); box-shadow: 0 2px 8px var(--primary-soft); }
+.kpi-value { font-size: 30px; letter-spacing: -.04em; font-weight: 700; line-height: 1.2; }
+.insight-banner { display: flex; align-items: center; justify-content: space-between; gap: 20px; background: var(--primary-soft); border: 1px solid var(--primary-line); border-radius: 9px; padding: 20px 24px; }
+@media (max-width: 639px) { .insight-banner { align-items: flex-start; flex-direction: column; padding: 18px; } }

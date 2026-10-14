@@ -1,0 +1,13 @@
+{
+  "checks": [
+    "Django admin login light 1440px: pass",
+    "Django admin login light 768px: pass",
+    "Django admin login light 375px: pass",
+    "Django admin login dark 1440px: pass",
+    "Django admin login dark 768px: pass",
+    "Django admin login dark 375px: pass"
+  ],
+  "console_errors": [],
+  "csrf_form_preserved": true,
+  "mode": "Django Client GET and browser-rendered template; no database changes"
+}

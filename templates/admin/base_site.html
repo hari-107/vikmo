@@ -1,0 +1,19 @@
+{% extends "admin/base.html" %}
+{% load static %}
+{% block title %}{{ title }} | VIKMO Administration{% endblock %}
+{% block dark-mode-vars %}
+  <link rel="stylesheet" href="{% static 'admin/css/dark_mode.css' %}">
+  <script src="{% static 'dealerdesk/admin-theme.js' %}"></script>
+{% endblock %}
+{% block extrahead %}
+  {{ block.super }}
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="{% static 'dealerdesk/admin.css' %}">
+{% endblock %}
+{% block branding %}
+  <div class="vikmo-admin-brand"><span class="vikmo-admin-mark">V</span><div><a href="{% url 'admin:index' %}">VIKMO</a><small>Dealer Desk · Administration</small></div>
+    <select id="vikmo-admin-theme" aria-label="Color theme">
+      <option value="light">Light</option><option value="dark">Dark</option><option value="system">System</option>
+    </select>
+  </div>
+{% endblock %}

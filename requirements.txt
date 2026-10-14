@@ -1,0 +1,16 @@
+# Core Django & Database
+Django>=4.2,<6
+djangorestframework>=3.15
+psycopg[binary]>=3.1
+dj-database-url>=2.1
+python-dotenv>=1.0
+requests>=2.31
+
+# AI / LLM Assistant
+google-genai>=0.1.1
+groq>=0.18.0
+
+# ML & Forecasting
+pandas>=2.0
+numpy>=1.24
+scikit-learn>=1.3

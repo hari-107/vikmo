@@ -1,0 +1,64 @@
+:root, html[data-theme="light"] {
+  --vikmo-canvas: #F7F8FA; --vikmo-surface: #FFFFFF; --vikmo-panel: #FFFFFF;
+  --vikmo-text: #111827; --vikmo-secondary: #6B7280; --vikmo-border: #E5E7EB;
+  --vikmo-primary: #4F46E5; --vikmo-hover: #4338CA; --vikmo-on-primary: #FFFFFF;
+  --vikmo-success: #16A34A; --vikmo-warning: #D97706; --vikmo-error: #DC2626;
+  color-scheme: light;
+}
+html[data-theme="dark"] {
+  --vikmo-canvas: #0B0F19; --vikmo-surface: #111827; --vikmo-panel: #151C2C;
+  --vikmo-text: #F3F4F6; --vikmo-secondary: #9CA3AF; --vikmo-border: #273244;
+  --vikmo-primary: #818CF8; --vikmo-hover: #A5B4FC; --vikmo-on-primary: #0B0F19;
+  --vikmo-success: #4ADE80; --vikmo-warning: #FBBF24; --vikmo-error: #F87171;
+  color-scheme: dark;
+}
+:root, html[data-theme] {
+  --primary: var(--vikmo-primary); --secondary: var(--vikmo-primary); --accent: var(--vikmo-on-primary);
+  --primary-fg: var(--vikmo-on-primary); --body-fg: var(--vikmo-text); --body-bg: var(--vikmo-canvas);
+  --body-quiet-color: var(--vikmo-secondary); --body-loud-color: var(--vikmo-text);
+  --header-color: var(--vikmo-text); --header-branding-color: var(--vikmo-text);
+  --header-bg: var(--vikmo-surface); --header-link-color: var(--vikmo-primary);
+  --breadcrumbs-fg: var(--vikmo-secondary); --breadcrumbs-link-fg: var(--vikmo-text); --breadcrumbs-bg: var(--vikmo-surface);
+  --link-fg: var(--vikmo-primary); --link-hover-color: var(--vikmo-hover); --link-selected-fg: var(--vikmo-primary);
+  --hairline-color: var(--vikmo-border); --border-color: var(--vikmo-border);
+  --darkened-bg: var(--vikmo-surface); --selected-bg: var(--vikmo-panel);
+  --selected-row: color-mix(in srgb, var(--vikmo-primary) 10%, var(--vikmo-panel));
+  --button-fg: var(--vikmo-on-primary); --button-bg: var(--vikmo-primary); --button-hover-bg: var(--vikmo-hover);
+  --default-button-bg: var(--vikmo-primary); --default-button-hover-bg: var(--vikmo-hover);
+  --close-button-bg: var(--vikmo-secondary); --close-button-hover-bg: var(--vikmo-text);
+  --delete-button-bg: var(--vikmo-error); --delete-button-hover-bg: var(--vikmo-error);
+  --error-fg: var(--vikmo-error); --message-success-bg: color-mix(in srgb, var(--vikmo-success) 10%, var(--vikmo-panel));
+  --object-tools-fg: var(--vikmo-on-primary); --object-tools-bg: var(--vikmo-primary); --object-tools-hover-bg: var(--vikmo-hover);
+  --message-warning-bg: color-mix(in srgb, var(--vikmo-warning) 10%, var(--vikmo-panel));
+  --message-error-bg: color-mix(in srgb, var(--vikmo-error) 10%, var(--vikmo-panel));
+  --font-family-primary: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+body { font-family: var(--font-family-primary); }
+#header { border-bottom: 1px solid var(--vikmo-border); padding: 18px 28px; gap: 16px; }
+.vikmo-admin-brand { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.vikmo-admin-brand a { font-size: 19px; font-weight: 800; letter-spacing: .04em; color: var(--vikmo-text) !important; }
+.vikmo-admin-brand small { display: block; color: var(--vikmo-secondary); font-size: 11px; margin-top: 3px; }
+.vikmo-admin-mark { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 8px; background: var(--vikmo-primary); color: var(--vikmo-on-primary); font-weight: 800; }
+#vikmo-admin-theme { background: var(--vikmo-panel); color: var(--vikmo-text); border: 1px solid var(--vikmo-border); border-radius: 6px; padding: 7px 10px; }
+.theme-toggle { display: none; }
+div.breadcrumbs { border-bottom: 1px solid var(--vikmo-border); padding: 12px 28px; }
+.module, .inline-group, .submit-row, #changelist { border: 1px solid var(--vikmo-border); border-radius: 8px; background: var(--vikmo-panel); overflow: hidden; }
+.module h2, .module caption, .inline-group h2 { background: var(--vikmo-surface); color: var(--vikmo-text); border-bottom: 1px solid var(--vikmo-border); padding: 14px; font-size: 12px; }
+.module caption a.section { color: var(--vikmo-text); }
+th { background: var(--vikmo-surface); color: var(--vikmo-secondary); }
+td, th { padding: 12px; }
+input[type="text"], input[type="password"], input[type="email"], input[type="number"], textarea, select { background: var(--vikmo-panel); color: var(--vikmo-text); border: 1px solid var(--vikmo-border); border-radius: 6px; padding: 9px 11px; }
+.button, input[type="submit"], .submit-row input, a.button, .object-tools a { border-radius: 6px; padding: 10px 16px; }
+:where(a, button, input, textarea, select):focus-visible { outline: 2px solid var(--vikmo-primary); outline-offset: 3px; }
+.login #container { width: min(420px, calc(100% - 32px)); margin: 10vh auto; border: 1px solid var(--vikmo-border); border-radius: 12px; background: var(--vikmo-panel); overflow: hidden; }
+.login #header { justify-content: space-between; text-align: left; padding: 24px; flex-wrap: wrap; }
+.login #content { padding: 28px; }
+.login .form-row { margin-top: 16px; }
+.login .form-row label { color: var(--vikmo-secondary); font-size: 12px; font-weight: 600; }
+.login .form-row input { box-sizing: border-box; width: 100%; padding: 11px; }
+.login .submit-row { padding: 20px 0 0; border: 0; }
+.login .submit-row input { width: 100%; }
+.vikmo-password-toggle { display: block; margin: 8px 0; padding: 4px 0; font: inherit; font-size: 11px; color: var(--vikmo-primary); background: transparent; border: 0; cursor: pointer; }
+input, button, a, select { transition: background-color 180ms, color 180ms, border-color 180ms; }
+@media (max-width: 600px) { #header { padding: 16px; } .login #container { margin: 6vh auto; } .login #content { padding: 22px; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
