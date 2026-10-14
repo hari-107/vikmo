@@ -63,9 +63,6 @@ def generate_forecast(
 
     # Four strictly future weekly starts after the last actual observation.
     test_weeks = _next_monday_weeks(latest_sales_week, count=4)
-    forecast_start = test_weeks[0]
-    forecast_end = test_weeks[-1]
-
     # Sales data after the latest known weekly observation is not used for training.
     train_sales = sales[sales["week_start"] <= latest_sales_week].copy()
 
