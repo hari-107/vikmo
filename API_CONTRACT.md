@@ -292,7 +292,7 @@ Commit `ml/forecast.csv` with exactly these columns:
 sku,week_start,forecast_units
 ```
 
-- One row per SKU in `data/lead_times.csv` (40 SKUs) for each of the 4 weeks **2026-09-28, 2026-10-05, 2026-10-12, 2026-10-19**. That's 160 rows.
+- One row per SKU in `data/lead_times.csv` (40 SKUs) for each of the next 4 weekly starts after the latest observed week in `data/sales_history.csv`. That's 160 rows. The horizon rolls forward when new actual sales weeks are added and the forecast is regenerated.
 - `forecast_units` is a non-negative number (decimals allowed).
 - These are **real future weeks**. We hold the actual sales and score your file against them.
 
@@ -300,7 +300,7 @@ sku,week_start,forecast_units
 
 | Method & path | Behaviour |
 |---|---|
-| `GET /api/forecast/{sku}/` | `200 {"sku": "...", "forecast": [{"week_start": "2026-09-28", "forecast_units": 31.4}, ...]}`. 4 weeks, same values as `ml/forecast.csv`. Unknown SKU or not a forecast SKU → `404`. |
+| `GET /api/forecast/{sku}/` | `200 {"sku": "...", "forecast": [{"week_start": "YYYY-MM-DD", "forecast_units": 31.4}, ...]}`. Returns the 4 upcoming weeks, with the same values as `ml/forecast.csv`. Unknown SKU or not a forecast SKU → `404`. |
 | `GET /api/reorder-suggestions/` | `200 {"results": [ ... ]}` with one entry per forecast SKU (40, not paginated). |
 
 Reorder entry:
