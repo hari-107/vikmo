@@ -18,24 +18,28 @@ import { StockBadge } from "../components/Badge";
 import { TableSkeleton } from "../components/LoadingSkeleton";
 import { EmptyState } from "../components/EmptyState";
 
+function formatWeek(dateString) {
+  const date = new Date(`${dateString}T00:00:00`);
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}
+
 export function Forecasting() {
   const { reducedMotion } = useTheme();
   const [reorders, setReorders] = useState([]);
   const [loadingReorders, setLoadingReorders] = useState(true);
   const [reordersError, setReordersError] = useState(null);
 
-  // Selected SKU for forecast chart
+  // The selected SKU's forecast contains four future weekly predictions.
   const [selectedSku, setSelectedSku] = useState("");
   const [forecastData, setForecastData] = useState([]);
   const [loadingForecast, setLoadingForecast] = useState(false);
   const [forecastError, setForecastError] = useState(null);
-
-  // Table search filter
   const [searchTerm, setSearchTerm] = useState("");
-
-
-
-
 
   const fetchReorders = useCallback(async () => {
     setLoadingReorders(true);
@@ -45,9 +49,8 @@ export function Forecasting() {
       const list = res.results || [];
       setReorders(list);
       if (list.length > 0) {
-        // Default to first SKU with reorder_qty > 0 or first SKU
         const topUrgent = list.find((x) => x.reorder_qty > 0) || list[0];
-        setSelectedSku(previous => previous || topUrgent.sku);
+        setSelectedSku((previous) => previous || topUrgent.sku);
       }
     } catch (err) {
       setReordersError(err.message || "Failed to load reorder recommendations.");
@@ -61,7 +64,10 @@ export function Forecasting() {
     setForecastError(null);
     try {
       const res = await getForecast(sku);
-      setForecastData(res.forecast || []);
+      const points = (res.forecast || []).slice().sort(
+        (a, b) => a.week_start.localeCompare(b.week_start)
+      );
+      setForecastData(points);
     } catch (err) {
       setForecastError(err.message || `Failed to load forecast for ${sku}.`);
     } finally {
@@ -70,16 +76,19 @@ export function Forecasting() {
   }, []);
 
   const selectedMetrics = reorders.find((r) => r.sku === selectedSku);
-
   const filteredReorders = reorders.filter((r) =>
     r.sku.toLowerCase().includes(searchTerm.toLowerCase().trim())
   );
+  const forecastRange = forecastData.length
+    ? `${formatWeek(forecastData[0].week_start)} – ${formatWeek(forecastData[forecastData.length - 1].week_start)}`
+    : "";
 
   useEffect(() => {
     // Loading state tracks this external API request.
     // oxlint-disable-next-line react/set-state-in-effect
     fetchReorders();
   }, [fetchReorders]);
+
   useEffect(() => {
     if (selectedSku) {
       // Loading state tracks the selected SKU request.
@@ -90,19 +99,21 @@ export function Forecasting() {
 
   return (
     <div className="space-y-6">
-      {/* Page Title */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">
             Demand Forecasting & Reorder Analytics
           </h1>
           <p className="text-sm text-secondary">
-            Automated 4-week demand predictions, moving festival modeling, and safety stock calculations.
+            Predict demand for the next four weeks using sales history, promotions, and seasonal patterns.
           </p>
+        </div>
+        <div className="inline-flex items-center gap-2 self-start rounded-full border border-line bg-surface px-3 py-2 text-xs font-semibold text-foreground">
+          <span className="h-2 w-2 rounded-full bg-success" />
+          Upcoming 4 weeks
         </div>
       </div>
 
-      {/* Top Section: Deep Dive Chart & SKU KPI Cards */}
       <div className="panel rounded-xl border border-line shadow-xs p-6 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-line/60 pb-4">
           <div className="flex items-center gap-3">
@@ -111,10 +122,10 @@ export function Forecasting() {
             </div>
             <div>
               <h2 className="font-display font-bold text-lg text-foreground">
-                4-Week Demand Curve: {selectedSku}
+                4-Week Demand Forecast: {selectedSku}
               </h2>
               <p className="text-xs text-secondary">
-                Weekly forecast demand for the selected part.
+                {forecastRange ? `Forecast weeks: ${forecastRange}` : "Weekly predicted demand for the selected part."}
               </p>
             </div>
           </div>
@@ -135,7 +146,6 @@ export function Forecasting() {
           </div>
         </div>
 
-        {/* Selected SKU Metric Badges */}
         {selectedMetrics && (
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             <div className="p-4 bg-surface rounded-lg border border-line shadow-2xs">
@@ -196,11 +206,10 @@ export function Forecasting() {
           </div>
         )}
 
-        {/* Recharts Weekly Demand Graph */}
         <div className="h-64 w-full pt-2">
           {loadingForecast ? (
             <div role="status" className="h-full animate-pulse rounded-lg bg-subtle flex items-center justify-center text-xs text-secondary">
-              Loading forecast curve…
+              Loading upcoming forecast…
             </div>
           ) : forecastError ? (
             <div className="h-full flex items-center justify-center text-xs text-danger">
@@ -208,7 +217,7 @@ export function Forecasting() {
             </div>
           ) : forecastData.length === 0 ? (
             <div className="h-full flex items-center justify-center text-xs text-secondary">
-              No weekly forecast points available.
+              No upcoming weekly forecast points available.
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
@@ -216,6 +225,7 @@ export function Forecasting() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--line)" />
                 <XAxis
                   dataKey="week_start"
+                  tickFormatter={formatWeek}
                   tick={{ fontSize: 11, fill: "var(--secondary)" }}
                   tickLine={false}
                 />
@@ -227,8 +237,8 @@ export function Forecasting() {
                 <Tooltip
                   cursor={{ fill: "var(--subtle)" }}
                   itemStyle={{ color: "var(--foreground)" }}
-                  formatter={(val) => [`${val} units`, "Forecast Demand"]}
-                  labelFormatter={(lbl) => `Week: ${lbl}`}
+                  formatter={(val) => [`${val} units`, "Predicted Demand"]}
+                  labelFormatter={(lbl) => `Week starting ${formatWeek(lbl)}`}
                   contentStyle={{
                     backgroundColor: "var(--surface)",
                     color: "var(--foreground)",
@@ -251,7 +261,6 @@ export function Forecasting() {
         </div>
       </div>
 
-      {/* Bottom Section: 40 SKUs Reorder Table */}
       <div className="panel rounded-xl border border-line shadow-xs overflow-hidden space-y-0">
         <div className="p-5 border-b border-line flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
@@ -259,7 +268,7 @@ export function Forecasting() {
               Forecast SKUs & Inventory Thresholds
             </h3>
             <p className="text-xs text-secondary">
-              Calculated dynamically using live available warehouse inventory.
+              Reorder quantities are calculated from the forecast horizon and live warehouse inventory.
             </p>
           </div>
           <div className="relative w-full sm:w-64">
@@ -313,11 +322,14 @@ export function Forecasting() {
                       onClick={() => setSelectedSku(r.sku)}
                       tabIndex={0}
                       aria-label={`View forecast for ${r.sku}`}
-                      onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setSelectedSku(r.sku); } }}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          setSelectedSku(r.sku);
+                        }
+                      }}
                       className={`cursor-pointer transition-colors ${
-                        isSelected
-                          ? "bg-primary-soft/50"
-                          : "hover:bg-surface"
+                        isSelected ? "bg-primary-soft/50" : "hover:bg-surface"
                       }`}
                     >
                       <td className="px-5 py-3 font-mono text-xs font-bold text-foreground">
