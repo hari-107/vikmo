@@ -16,3 +16,50 @@ tbody tr:hover { background: var(--subtle); }
 .kpi-value { font-size: 30px; letter-spacing: -.04em; font-weight: 700; line-height: 1.2; }
 .insight-banner { display: flex; align-items: center; justify-content: space-between; gap: 20px; background: var(--primary-soft); border: 1px solid var(--primary-line); border-radius: 9px; padding: 20px 24px; }
 @media (max-width: 639px) { .insight-banner { align-items: flex-start; flex-direction: column; padding: 18px; } }
+
+
+/* Motion polish: restrained, fast feedback for everyday dealer workflows. */
+.panel {
+  animation: panel-arrive 420ms cubic-bezier(.2,.75,.25,1) both;
+  transform-origin: 50% 15%;
+}
+.panel:hover {
+  border-color: color-mix(in srgb, var(--primary) 24%, var(--line));
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--foreground) 5%, transparent);
+}
+.kpi-card, .data-table tbody tr, .nav-item, .sync-button, .btn-primary, .btn-secondary, .btn-ghost {
+  transition:
+    transform 180ms cubic-bezier(.2,.75,.25,1),
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease;
+}
+.kpi-card:hover { transform: translateY(-3px); }
+.data-table tbody tr:hover { transform: translateX(2px); }
+.nav-item:hover { transform: translateX(3px); }
+.btn-primary:hover, .btn-secondary:hover, .btn-ghost:hover { transform: translateY(-1px); }
+.btn-primary:active:not(:disabled), .btn-secondary:active:not(:disabled), .btn-ghost:active:not(:disabled) { transform: translateY(0) scale(.985); }
+.page-transition > * { animation: content-arrive 360ms cubic-bezier(.2,.75,.25,1) both; }
+.page-transition > *:nth-child(2) { animation-delay: 45ms; }
+.page-transition > *:nth-child(3) { animation-delay: 90ms; }
+.page-transition > *:nth-child(4) { animation-delay: 135ms; }
+.data-table tbody tr { animation: row-arrive 260ms ease-out both; }
+.data-table tbody tr:nth-child(2) { animation-delay: 20ms; }
+.data-table tbody tr:nth-child(3) { animation-delay: 40ms; }
+.data-table tbody tr:nth-child(4) { animation-delay: 60ms; }
+.data-table tbody tr:nth-child(5) { animation-delay: 80ms; }
+.brand-icon { transition: transform 240ms cubic-bezier(.2,.75,.25,1), box-shadow 240ms ease; }
+.brand:hover .brand-icon { transform: rotate(-7deg) scale(1.06); box-shadow: 0 5px 16px var(--primary-soft); }
+@keyframes panel-arrive {
+  from { opacity: 0; transform: translateY(10px) scale(.992); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes content-arrive {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes row-arrive {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
