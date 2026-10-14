@@ -1,4 +1,3 @@
-import os
 import sys
 from pathlib import Path
 from typing import List, Optional
@@ -20,6 +19,7 @@ from forecasting.models import (
 def _upcoming_week_starts(
     latest_observed_week: pd.Timestamp,
     count: int = 4,
+    today: Optional[pd.Timestamp] = None,
 ) -> tuple[List[pd.Timestamp], List[pd.Timestamp]]:
     """
     Return (internal_weeks, output_weeks).
@@ -30,7 +30,12 @@ def _upcoming_week_starts(
     four genuinely upcoming weeks.
     """
     latest = pd.Timestamp(latest_observed_week).normalize()
-    today = pd.Timestamp.now(tz="Asia/Kolkata").normalize().tz_localize(None)
+    if today is None:
+        today = pd.Timestamp.now(tz="Asia/Kolkata").normalize().tz_localize(None)
+    else:
+        today = pd.Timestamp(today).normalize()
+        if today.tz is not None:
+            today = today.tz_localize(None)
     current_monday = today - pd.Timedelta(days=today.weekday())
     next_monday = current_monday + pd.Timedelta(days=7)
 
