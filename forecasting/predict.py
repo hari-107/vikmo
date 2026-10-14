@@ -17,11 +17,29 @@ from forecasting.models import (
 )
 
 
-def _next_monday_weeks(last_observed_week: pd.Timestamp, count: int = 4) -> List[pd.Timestamp]:
-    """Return the next weekly starts strictly after the latest observed sales week."""
-    latest = pd.Timestamp(last_observed_week).normalize()
-    next_week = latest + pd.Timedelta(days=7)
-    return [next_week + pd.Timedelta(weeks=i) for i in range(count)]
+def _upcoming_week_starts(
+    latest_observed_week: pd.Timestamp,
+    count: int = 4,
+) -> tuple[List[pd.Timestamp], List[pd.Timestamp]]:
+    """
+    Return (internal_weeks, output_weeks).
+
+    The output horizon starts next Monday, so a partially completed/current week is
+    not presented as a future prediction. If historical data is stale, the model
+    recursively forecasts the missing weekly buckets internally before emitting the
+    four genuinely upcoming weeks.
+    """
+    latest = pd.Timestamp(latest_observed_week).normalize()
+    today = pd.Timestamp.now(tz="Asia/Kolkata").normalize().tz_localize(None)
+    current_monday = today - pd.Timedelta(days=today.weekday())
+    next_monday = current_monday + pd.Timedelta(days=7)
+
+    output_start = max(latest + pd.Timedelta(days=7), next_monday)
+    output_weeks = [output_start + pd.Timedelta(weeks=i) for i in range(count)]
+
+    internal_start = latest + pd.Timedelta(days=7)
+    internal_weeks = list(pd.date_range(start=internal_start, end=output_weeks[-1], freq="7D"))
+    return internal_weeks, output_weeks
 
 
 def generate_forecast(
@@ -81,7 +99,7 @@ def generate_forecast(
 
     meta_records = []
     for sku in skus:
-        for week_dt in test_weeks:
+        for week_dt in internal_weeks:
             week_str = week_dt.strftime("%Y-%m-%d")
             meta_records.append({
                 "sku": sku,
@@ -91,24 +109,26 @@ def generate_forecast(
             })
     test_meta = pd.DataFrame(meta_records)
 
-    # 3. Fit the established hybrid model on history and forecast recursively.
+    # 3. Forecast recursively from the latest known sales week through the target
+    # horizon, then expose only the four upcoming weeks to the API and reorder logic.
     pipeline = HybridForecastPipeline(random_state=random_state)
     forecast_df = pipeline.fit_and_predict(
         train_sales=train_sales,
         skus=skus,
-        test_weeks=test_weeks,
+        test_weeks=internal_weeks,
         test_meta=test_meta,
     )
+    forecast_df["week_start"] = pd.to_datetime(forecast_df["week_start"]).dt.strftime("%Y-%m-%d")
+    forecast_df = forecast_df[forecast_df["week_start"].isin(output_week_strings)].copy()
 
     # 4. Keep the contract schema, with exactly 4 future weeks per SKU.
-    forecast_df["week_start"] = pd.to_datetime(forecast_df["week_start"]).dt.strftime("%Y-%m-%d")
     forecast_df["forecast_units"] = (
         forecast_df["forecast_units"].astype(float).clip(lower=0.0).round(1)
     )
     forecast_df = forecast_df[["sku", "week_start", "forecast_units"]]
     forecast_df = forecast_df.sort_values(["sku", "week_start"]).reset_index(drop=True)
 
-    expected_weeks = [w.strftime("%Y-%m-%d") for w in test_weeks]
+    expected_weeks = [w.strftime("%Y-%m-%d") for w in output_weeks]
     assert len(forecast_df) == len(skus) * 4, (
         f"Expected {len(skus) * 4} rows ({len(skus)} SKUs x 4 weeks), got {len(forecast_df)}"
     )
