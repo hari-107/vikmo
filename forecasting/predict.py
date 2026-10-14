@@ -50,9 +50,9 @@ def generate_forecast(
     """
     Generate a rolling 4-week-ahead demand forecast for every SKU in lead_times.csv.
 
-    The horizon is anchored to the latest week present in sales_history.csv, not to
-    fixed historical calendar dates. All sales observations up to and including that
-    latest observed week are used for training; predictions begin on the next week.
+    The displayed horizon starts next Monday and must also be after the latest
+    observed sales week. If history is stale, missing intermediate buckets are
+    forecast recursively but only the four upcoming weeks are written to the CSV.
 
     Output schema remains sku, week_start, forecast_units for API compatibility.
     """
